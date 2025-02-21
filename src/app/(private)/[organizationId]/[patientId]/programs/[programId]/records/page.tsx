@@ -28,7 +28,6 @@ async function getApplications(
 
   const applications: Application[] = await res.json();
 
-  console.log(applications);
 
   return applications;
 }
