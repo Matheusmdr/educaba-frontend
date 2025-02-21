@@ -6,7 +6,7 @@ import { AppParams } from "@/types/app";
 import { Program } from "@/types/program";
 import { Search, SlidersHorizontal } from "lucide-react";
 
- async function getPrograms(
+async function getPrograms(
   accessToken?: string,
   patientId?: string
 ): Promise<Program[] | null> {
@@ -42,9 +42,9 @@ export default async function Page({ params }: PageProps) {
   const programsPromise = getPrograms(session?.user.token, patientId);
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-gray-50 p-4">
+    <div className="flex min-h-screen flex-col items-center  p-4">
       <div className="w-full max-w-md md:max-w-4xl">
-        <h1 className="text-2xl font-bold text-gray-800 md:text-3xl">
+        <h1 className="mb-4 text-2xl font-semibold text-text-title">
           Programas
         </h1>
 
@@ -52,7 +52,7 @@ export default async function Page({ params }: PageProps) {
           <Search className="text-gray-500" size={20} />
           <Input
             placeholder="Pesquisar"
-            className="flex-1 border-none focus:ring-0"
+            className="flex-1 border-none focus:ring-0 shadow-none"
           />
           <SlidersHorizontal className="text-gray-500" size={20} />
         </div>
