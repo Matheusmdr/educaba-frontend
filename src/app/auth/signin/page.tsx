@@ -21,6 +21,9 @@ import { toast } from "sonner";
 
 import { Loader2 } from "lucide-react";
 
+import EducabaLogo from "@/assets/educaba-logo.png"
+import Image from "next/image";
+
 const formSchema = z.object({
   email: z.string().email("Forneça um email válido."),
   password: z.string().min(6, "A senha deve ter no mínimo 6 caracteres."),
@@ -58,12 +61,13 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4">
-      <div className="w-full max-w-md rounded-md bg-white p-6 shadow-md">
-        <h1 className="mb-4 text-center text-2xl font-semibold">
+    <div className="flex min-h-screen flex-col items-center justify-center  p-4">
+      <Image src={EducabaLogo} alt="Logo Educaba" className="max-w-52"/>
+      <div className="w-full max-w-md rounded-md bg-white p-6">
+        <h1 className="mb-4 text-2xl font-semibold text-text-title">
           Bem vindo(a) de volta
         </h1>
-        <p className="mb-6 text-center text-sm text-gray-500">
+        <p className="mb-6 text-sm text-text-light">
           Por favor, insira seu endereço de e-mail e senha para login
         </p>
 
@@ -76,7 +80,7 @@ export default function SignInPage() {
                 <FormItem>
                   <FormLabel>E-mail</FormLabel>
                   <FormControl>
-                    <Input placeholder="jane.doe@gmail.com" {...field} />
+                    <Input placeholder="jane.doe@gmail.com" className="border-[#E9F1FF] border rounded-xl text-text-title" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -93,6 +97,7 @@ export default function SignInPage() {
                     <Input
                       type="password"
                       placeholder="Insira sua senha"
+                      className="border-[#E9F1FF] border rounded-xl text-text-title"
                       {...field}
                     />
                   </FormControl>
@@ -102,13 +107,15 @@ export default function SignInPage() {
             />
 
             <div className="flex justify-end">
-              <a href="#" className="text-sm text-blue-600 hover:underline">
+              <a href="#" className="text-sm font-medium text-text-title hover:underline">
                 Esqueceu sua senha?
               </a>
             </div>
 
-            <Button type="submit" className="w-full cursor-pointer">
-              {isLoading && <Loader2 className="w-4 h-4 text-white animate-spin" />}
+            <Button type="submit" className="w-full cursor-pointer bg-blue-primary hover:bg-blue-primary/67 transition-all duration-300 rounded-xl">
+              {isLoading && (
+                <Loader2 className="w-4 h-4 text-white animate-spin" />
+              )}
               Entrar
             </Button>
           </form>
