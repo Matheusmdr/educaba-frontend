@@ -6,7 +6,7 @@ import { AppParams } from "@/types/app";
 import { Program } from "@/types/program";
 import { Search, SlidersHorizontal } from "lucide-react";
 
-export async function getPrograms(
+ async function getPrograms(
   accessToken?: string,
   patientId?: string
 ): Promise<Program[] | null> {

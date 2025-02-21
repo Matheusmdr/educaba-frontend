@@ -59,7 +59,7 @@ function DynamicStackedBarChart({
         tiposEntrada: Array.from(tiposEntrada),
       })
     )
-  }, [])
+  }, [rawData])
 
   const chartConfigs = useMemo(() => {
     const configs: Record<
