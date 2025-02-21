@@ -20,7 +20,7 @@ export const env = createEnv({
    */
   client: {
     // NEXT_PUBLIC_CLIENTVAR: z.string(),
-    NEXT_PUBLIC_API_HOST: z.string().url(),
+    NEXT_PUBLIC_API_HOST: z.string(),
   },
 
   /**
