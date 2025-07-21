@@ -1,22 +1,9 @@
 import { Button } from "@/components/ui/button";
-import { env } from "@/env";
+import { getUser } from "@/server/actions/user";
 import { auth } from "@/server/auth";
-import { UserResponse } from "@/types/user";
 import { ArrowRight, Building2 } from "lucide-react";
 import { redirect } from "next/navigation";
 
-async function getUser(accessToken?: string): Promise<UserResponse | null> {
-  if (!accessToken) return null;
-
-  const res = await fetch(`${env.NEXT_PUBLIC_API_HOST}/api/user/me`, {
-    headers: { Authorization: `Bearer ${accessToken}` },
-    cache: "force-cache"
-  });
-
-  if (!res.ok) return null;
-
-  return res.json();
-}
 
 export default async function Page() {
   const session = await auth();
@@ -26,8 +13,6 @@ export default async function Page() {
   if (user?.organization) {
     return redirect(`/${user.organization.id}`);
   }
-
-  
 
 
   return (

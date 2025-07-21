@@ -1,41 +1,10 @@
 import { Programs } from "@/components/programs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { env } from "@/env";
+import { getPrograms } from "@/server/actions/programs";
 import { auth } from "@/server/auth";
 import { AppParams } from "@/types/app";
-import { Program } from "@/types/program";
 import { Search, SlidersHorizontal } from "lucide-react";
-
-async function getPrograms(
-  accessToken?: string,
-  patientId?: string
-): Promise<Program[] | null> {
-  if (!accessToken) return null;
-
-  if (!patientId) return null;
-
-  const res = await fetch(
-    `${env.NEXT_PUBLIC_API_HOST}/api/program?patient_id=${patientId}`,
-    {
-      headers: { Authorization: `Bearer ${accessToken}` },
-      cache: "force-cache",
-    }
-  );
-
-  if (!res.ok) {
-    return null;
-  }
-
-  const programs: Program[] = await res.json();
-
-  return programs
-    .sort(
-      (a, b) =>
-        new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
-    )
-    .slice(0, 3);
-}
 
 interface PageProps {
   params: Promise<AppParams>;
@@ -45,11 +14,11 @@ export default async function Page({ params }: PageProps) {
   const { patientId } = await params;
   const session = await auth();
 
-  const programsPromise = getPrograms(session?.user.token, patientId);
+  const programsPromise = getPrograms(session?.user.token, patientId, 3);
 
   return (
-    <div className="flex min-h-screen flex-col items-center p-4">
-      <div className="w-full max-w-md md:max-w-4xl">
+    <div className="flex flex-col items-center p-4">
+      <div className="w-full">
         <h1 className="mb-4 text-2xl font-semibold text-text-title">
           Dashboard
         </h1>

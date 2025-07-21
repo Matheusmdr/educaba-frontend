@@ -17,4 +17,5 @@ export type Program = {
   updated_at: string;
   created_at: string;
   sets: Set[];
+  inputs: { name: string; type: string }[];
 };

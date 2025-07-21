@@ -1,32 +1,7 @@
 import { DynamicStackedBarChart } from "@/components/dynamic-stacked-bar-chart";
-import { env } from "@/env";
+import { getApplications } from "@/server/actions/patient";
 import { auth } from "@/server/auth";
 import { AppParams } from "@/types/app";
-import { Application } from "@/types/application";
-
-async function getApplications(
-  accessToken?: string,
-  programId?: string
-): Promise<Application[] | null> {
-  if (!accessToken) return null;
-
-  const res = await fetch(
-    `${env.NEXT_PUBLIC_API_HOST}/api/application?program_id=${programId}`,
-    {
-      headers: { Authorization: `Bearer ${accessToken}` },
-      cache: "force-cache",
-    }
-  );
-
-  if (!res.ok) {
-    return null;
-  }
-
-  const applications: Application[] = await res.json();
-
-
-  return applications;
-}
 
 interface PageProps {
   params: Promise<AppParams>;
