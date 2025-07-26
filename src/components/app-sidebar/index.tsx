@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { BookCheck, Home } from "lucide-react";
+import { Contact, Home, List } from "lucide-react";
 
 import { NavMain } from "@/components/app-sidebar/components/nav-main";
 import { NavUser } from "@/components/app-sidebar/components/nav-user";
@@ -24,7 +24,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const data = {
     navMain: [
       {
-        title: "Inicio",
+        title: "Dashboard",
         url: `/${params.organizationId}/${params.patientId}`,
         icon: Home,
         isActive: true,
@@ -32,14 +32,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       {
         title: "Programas",
         url: `/${params.organizationId}/${params.patientId}/programs`,
-        icon: BookCheck,
+        icon: List,
         isActive: true,
       },
 
       {
         title: "Contatos",
         url: `/${params.organizationId}/${params.patientId}/contacts`,
-        icon: BookCheck,
+        icon: Contact,
         isActive: true,
       },
     ],

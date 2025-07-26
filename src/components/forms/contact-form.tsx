@@ -75,7 +75,7 @@ export default function ContactForm({
     <Form {...form}>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="mx-auto max-w-lg space-y-6"
+        className="mx-auto space-y-6"
       >
         <FormField
           control={form.control}

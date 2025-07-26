@@ -1,19 +1,19 @@
 import { Programs } from "@/components/programs";
-import { buttonVariants } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import { Button} from "@/components/ui/button";
 import { getPrograms } from "@/server/actions/programs";
 import { auth } from "@/server/auth";
-import { AppParams } from "@/types/app";
-import { Plus, Search, SlidersHorizontal } from "lucide-react";
+import type { AppParams } from "@/types/app";
 import Link from "next/link";
+import { SearchInput } from "@/components/search-input";
 
 interface PageProps {
   params: Promise<AppParams>;
+  searchParams: Promise<{ programName?: string }>;
 }
 
-export default async function Page({ params }: PageProps) {
+export default async function Page({ params, searchParams }: PageProps) {
   const { patientId, organizationId } = await params;
+  const { programName } = await searchParams;
   const session = await auth();
 
   const programsPromise = getPrograms(session?.user.token, patientId);
@@ -24,29 +24,24 @@ export default async function Page({ params }: PageProps) {
         <h1 className="mb-4 text-2xl font-semibold text-text-title">
           Programas
         </h1>
-
         <div className="flex gap-2 items-center justify-between h-12">
-          <div className="relative flex items-center space-x-2 rounded-lg bg-white shadow-sm w-full p-2">
-            <Search className="text-gray-500" size={20} />
-            <Input
-              placeholder="Pesquisar"
-              className="flex-1 border-none focus:ring-0 shadow-none"
+          <div>
+            <SearchInput
+              placeholder="Pesquisar por nome"
+              defaultValue={programName}
+              searchParamName="programName"
+              showSearchButton={true}
+              className="flex-1"
             />
-            <SlidersHorizontal className="text-gray-500" size={20} />
           </div>
-          <Link
-            href={`/${organizationId}/${patientId}/programs/create`}
-            className={cn(
-              buttonVariants({ size: "lg" }),
-              "gap-2 shadow-md bg-blue-primary hover:bg-blue-primary/90 h-full"
-            )}
-          >
-            <Plus className="h-5 w-5" />
-            Adicionar Programa
-          </Link>
-        </div>
 
-        <Programs programsPromise={programsPromise} />
+           <Button asChild className="bg-blue-primary hover:bg-blue-primary/90">
+            <Link href={`/${organizationId}/${patientId}/programs/create`}>
+              Adicionar Programa
+            </Link>
+          </Button>
+        </div>
+        <Programs programsPromise={programsPromise} filter={programName} />
       </div>
     </div>
   );

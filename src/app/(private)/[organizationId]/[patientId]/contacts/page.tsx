@@ -1,61 +1,48 @@
 import { listContacts } from "@/server/actions/contacts";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import Link from "next/link";
-import { ContactActions } from "./_components/contact-actions";
 import { Button } from "@/components/ui/button";
 import { AppParams } from "@/types/app";
 import { auth } from "@/server/auth";
+import ContactList from "./_components/contact-list";
+import { SearchInput } from "@/components/search-input";
 
 interface Props {
   params: Promise<AppParams>;
+  searchParams: Promise<{ contactName?: string }>;
 }
 
-export default async function Page({ params }: Props) {
+export default async function Page({ params, searchParams }: Props) {
   const { patientId } = await params;
   const session = await auth();
 
-  const contacts = await listContacts(patientId ?? "", session?.user.token);
+  const { contactName } = await searchParams;
+
+  const contacts = listContacts(patientId ?? "", session?.user.token);
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6 p-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Contatos</h1>
-        <Button asChild>
-          <Link href={`/patients/${patientId}/contacts/new`}>Novo contato</Link>
-        </Button>
+    <div className="flex flex-col items-center p-4">
+      <div className="w-full">
+        <h1 className="mb-4 text-2xl font-semibold text-text-title">
+          Contatos
+        </h1>
+        <div className="flex gap-2 items-center justify-between h-12">
+          <div>
+            <SearchInput
+              placeholder="Pesquisar por nome"
+              defaultValue={contactName}
+              searchParamName="contactName"
+              showSearchButton={true}
+              className="flex-1"
+            />
+          </div>
+          <Button asChild className="bg-blue-primary hover:bg-blue-primary/90">
+            <Link href={`/patients/${patientId}/contacts/new`}>
+              Adicionar Contato
+            </Link>
+          </Button>
+        </div>
+        <ContactList contactsPromise={contacts} filter={contactName} />
       </div>
-
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Nome</TableHead>
-            <TableHead>CPF</TableHead>
-            <TableHead>Telefone</TableHead>
-            <TableHead>E‑mail</TableHead>
-            <TableHead className="w-12" />
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {contacts.map((c) => (
-            <TableRow key={c.id}>
-              <TableCell>{c.name}</TableCell>
-              <TableCell>{c.cpf}</TableCell>
-              <TableCell>{c.phone_primary}</TableCell>
-              <TableCell>{c.email}</TableCell>
-              <TableCell>
-                <ContactActions patientId={patientId} contactId={c.id} />
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
     </div>
   );
 }

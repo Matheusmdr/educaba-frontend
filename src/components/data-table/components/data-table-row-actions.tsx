@@ -9,34 +9,21 @@ import { Button } from "@/components/ui/button";
 import { type Row } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { type PropsWithChildren } from "react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import Link from "next/link";
 
 interface DataTableRowActionsProps<TData extends { id: string }>
   extends PropsWithChildren {
   row: Row<TData>;
   editUrl?: string;
-  deleteUrl?: string;
+  DeleteDialog?: React.ReactNode;
 }
 
 export function DataTableRowActions<TData extends { id: string }>({
   row,
   editUrl,
-  deleteUrl,
+  DeleteDialog,
   children,
 }: DataTableRowActionsProps<TData>) {
-  const rowOriginal = row.original;
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -50,37 +37,11 @@ export function DataTableRowActions<TData extends { id: string }>({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
         <DropdownMenuItem>
-          <Link href={`${editUrl}${rowOriginal.id}`}>Editar</Link>
+          <Link href={`${editUrl}`}>Editar</Link>
         </DropdownMenuItem>
         {children}
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button
-                variant="destructive"
-                className="w-full justify-start text-left"
-              >
-                Delete
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete
-                  your account and remove your data from our servers.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction asChild>
-                  <Link href={`${deleteUrl}${rowOriginal.id}`}>Delete</Link>
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </DropdownMenuItem>
+        <DropdownMenuItem asChild>{DeleteDialog}</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -11,7 +11,8 @@ import {
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
-  ChevronsLeftRightIcon,
+  ChevronsLeft,
+  ChevronsRight,
 } from "lucide-react";
 
 interface DataTablePaginationProps<TData> {
@@ -60,7 +61,7 @@ export function DataTablePagination<TData>({
             disabled={!table.getCanPreviousPage()}
           >
             <span className="sr-only">Ir para a primeira página</span>
-            <ChevronsLeftRightIcon className="h-4 w-4" />
+            <ChevronsLeft className="h-4 w-4" />
           </Button>
           <Button
             variant="outline"
@@ -87,7 +88,7 @@ export function DataTablePagination<TData>({
             disabled={!table.getCanNextPage()}
           >
             <span className="sr-only">Ir para a última página</span>
-            <ChevronsLeftRightIcon className="h-4 w-4" />
+            <ChevronsRight className="h-4 w-4" />
           </Button>
         </div>
       </div>
