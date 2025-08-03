@@ -14,12 +14,10 @@ export default async function Page({ params }: PageProps) {
   const applicationsPromise = getApplications(session?.user.token, programId);
   return (
     <div className="min-h-screen flex flex-col items-center py-8">
-      <div className="w-full max-w-6xl px-4">
-        <header className="mb-8 text-center">
-          <h1 className="mb-4 text-2xl font-semibold text-text-title">
-            Gráfico do Programa
-          </h1>
-          <p className="mb-6 text-sm text-text-light">
+      <div className="w-full px-4">
+        <header className="flex flex-col items-start mb-4">
+          <h1  className="mb-1 text-2xl font-semibold text-text-title">Gráfico do Programa</h1>
+          <p className="text-sm text-muted-foreground">
             Visualize os dados do aplicativo do seu programa com o gráfico
             interativo abaixo.
           </p>

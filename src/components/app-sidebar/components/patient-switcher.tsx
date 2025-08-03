@@ -20,8 +20,9 @@ import { Patient } from "@/types/patient";
 import { useParams } from "next/navigation";
 import { AppParams } from "@/types/app";
 import { useSession } from "next-auth/react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import Link from "next/link";
+import Image from "next/image";
 
 export function PatientSwitcher() {
   const { isMobile } = useSidebar();
@@ -59,18 +60,19 @@ export function PatientSwitcher() {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              {patient?.image && (
-                <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage
+              <Avatar className="h-8 w-8 rounded-full">
+                {patient?.image ? (
+                  <Image
                     src={`${env.NEXT_PUBLIC_API_HOST}${patient.image}`}
                     alt={patient.name}
-                    className="object-cover"
+                    fill
                   />
-                  <AvatarFallback>
-                    {patient.name.charAt(0).toUpperCase()}
+                ) : (
+                  <AvatarFallback className="text-3xl">
+                    {patient?.name[0]}
                   </AvatarFallback>
-                </Avatar>
-              )}
+                )}
+              </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate text-xs">{patient?.name}</span>
               </div>

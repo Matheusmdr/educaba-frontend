@@ -22,7 +22,7 @@ export default async function Page({ params, searchParams }: Props) {
   return (
     <div className="flex flex-col items-center p-4">
       <div className="w-full">
-        <h1 className="mb-4 text-2xl font-semibold text-text-title">
+       <h1 className="mb-4 text-2xl font-semibold text-text-title">
           Contatos
         </h1>
         <div className="flex gap-2 items-center justify-between h-12">

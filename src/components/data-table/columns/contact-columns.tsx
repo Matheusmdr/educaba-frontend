@@ -24,6 +24,7 @@ import { AppParams } from "@/types/app";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown } from "lucide-react";
 import { parseAndFormat } from "@/utils/parse-and-format";
+import { RELATIONSHIPS } from "@/constants/relationship";
 
 export function useContactColumns(): ColumnDef<Contact>[] {
   const params: AppParams = useParams();
@@ -69,7 +70,20 @@ export function useContactColumns(): ColumnDef<Contact>[] {
 
       { accessorKey: "name", header: "Nome" },
       { accessorKey: "cpf", header: "CPF" },
-      { accessorKey: "relationship", header: "Parentesco" },
+      {
+        accessorKey: "relationship",
+        header: "Parentesco",
+        cell: ({ row }) => {
+          const relationship =
+            row.getValue<string | null>("relationship") ?? "";
+          return (
+            <div>
+              {relationship &&
+                RELATIONSHIPS[relationship as keyof typeof RELATIONSHIPS]}
+            </div>
+          );
+        },
+      },
       { accessorKey: "email", header: "E‑mail" },
       { accessorKey: "phone_primary", header: "Telefone 1" },
       { accessorKey: "phone_secondary", header: "Telefone 2" },
@@ -111,7 +125,7 @@ export function useContactColumns(): ColumnDef<Contact>[] {
           return (
             <DataTableRowActions
               row={row}
-              editUrl={`/patients/${pid}/contacts/edit/${row.original.id}`}
+              editUrl={`/${params.organizationId}/${pid}/contacts/${row.original.id}/edit`}
               DeleteDialog={
                 <AlertDialog>
                   <AlertDialogTrigger asChild>

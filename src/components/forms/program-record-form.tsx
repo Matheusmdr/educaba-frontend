@@ -32,6 +32,7 @@ import {
   RecordFormValues,
 } from "@/server/actions/record";
 import { RecordSchema } from "@/schemas/record";
+import { BackButton } from "../back-button";
 
 interface RecordEntry {
   id: string;
@@ -189,9 +190,15 @@ export default function ProgramRecordForm({ program, record }: Props) {
               />
             ))}
 
-            <Button type="submit" className="w-full mt-4">
-              {record ? "Atualizar Registro" : "Salvar Registro"}
-            </Button>
+            <div className="flex justify-end gap-2 items-center mt-4">
+              <BackButton label="Cancelar" />
+              <Button
+                type="submit"
+                className="bg-blue-primary hover:bg-blue-primary/90"
+              >
+                {record ? "Atualizar Registro" : "Salvar Registro"}
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </form>

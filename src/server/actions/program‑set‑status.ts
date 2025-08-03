@@ -34,6 +34,34 @@ export async function createProgramSetStatus(params: {
   return statusSchema.parse(await res.json());
 }
 
+export async function updateProgramSetStatus(params: {
+  id: string;
+  name: string;
+  accessToken: string;
+}) {
+  const { id, name, accessToken } = z
+    .object({
+      id: z.string().min(1),
+      name: z.string().min(1),
+      accessToken: z.string().min(1),
+    })
+    .parse(params);
+
+  const res = await fetch(`${env.NEXT_PUBLIC_API_HOST}/api/program-set-status`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify({ id, name }),
+    cache: "no-store",
+  });
+
+  if (!res.ok) throw new Error("Falha ao atualizar status do conjunto");
+  return statusSchema.parse(await res.json());
+}
+
 export async function listProgramSetStatus(accessToken: string) {
   const res = await fetch(
     `${env.NEXT_PUBLIC_API_HOST}/api/program-set-status`,

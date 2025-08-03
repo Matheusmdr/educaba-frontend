@@ -26,6 +26,7 @@ import {
 import { Button } from "../ui/button";
 import { useSession } from "next-auth/react";
 import { withMask } from "use-mask-input";
+import { BackButton } from "../back-button";
 
 const ContactSchema = z.object({
   id: z.string().optional(),
@@ -73,10 +74,7 @@ export default function ContactForm({
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="mx-auto space-y-6"
-      >
+      <form onSubmit={handleSubmit(onSubmit)} className="mx-auto space-y-6">
         <FormField
           control={form.control}
           name="name"
@@ -168,13 +166,16 @@ export default function ContactForm({
             </FormItem>
           )}
         />
-        <Button
-          type="submit"
-          disabled={formState.isSubmitting}
-          className="w-full h-11"
-        >
-          Salvar
-        </Button>
+        <div className="flex justify-end gap-2 items-center">
+          <BackButton label="Cancelar"/>
+          <Button
+            type="submit"
+            disabled={formState.isSubmitting}
+            className="bg-blue-primary hover:bg-blue-primary/90"
+          >
+            Salvar
+          </Button>
+        </div>
       </form>
     </Form>
   );

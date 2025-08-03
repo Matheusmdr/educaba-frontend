@@ -1,50 +1,82 @@
-'use client'
+"use client";
 
-import { Button } from '@/components/ui/button'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
-import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible'
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form'
+import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  Collapsible,
+  CollapsibleTrigger,
+  CollapsibleContent,
+} from "@/components/ui/collapsible";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
 
-import { ChevronLeft, Plus, Trash2, Settings, Target, SlidersHorizontal } from 'lucide-react'
-import { useForm, useFieldArray, Control } from 'react-hook-form'
-import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useState, startTransition } from 'react'
-import { useSession } from 'next-auth/react'
-import { toast } from 'sonner'
+import {
+  Plus,
+  Trash2,
+  Settings,
+  Target,
+  SlidersHorizontal,
+  Pencil,
+  X,
+  Check,
+} from "lucide-react";
+import { useForm, useFieldArray, Control } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useState, startTransition } from "react";
+import { useSession } from "next-auth/react";
+import { toast } from "sonner";
 
-import { createProgram, updateProgram } from '@/server/actions/programs'
-import { createProgramSetStatus, deleteProgramSetStatus, listProgramSetStatus } from '@/server/actions/program‑set‑status'
-import { Program } from '@/types/program'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/dialog'
+import { createProgram, updateProgram } from "@/server/actions/programs";
+import {
+  createProgramSetStatus,
+  deleteProgramSetStatus,
+  listProgramSetStatus,
+  updateProgramSetStatus,
+} from "@/server/actions/program‑set‑status";
+import { Program } from "@/types/program";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
+import { BackButton } from "../back-button";
 
 const InputSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(1),
-  type: z.enum(['number', 'text']),
-})
+  type: z.enum(["number", "text"]),
+});
 const GoalSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(1),
-})
+});
 const SetSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(1),
   program_set_status_id: z.string().min(1),
   goals: z.array(GoalSchema).min(1),
-})
+});
 const FormSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(1),
   inputs: z.array(InputSchema).min(1),
   sets: z.array(SetSchema).min(1),
-})
-type FormValues = z.infer<typeof FormSchema>
-const typeLabel = { number: 'Numérico', text: 'Texto' } as const
-const typeBadge = { number: 'default', text: 'secondary' } as const
+});
+type FormValues = z.infer<typeof FormSchema>;
+const typeLabel = { number: "Numérico", text: "Texto" } as const;
+const typeBadge = { number: "default", text: "secondary" } as const;
 
 /* ═════════ StatusDialog ═════════ */
 function StatusDialog({
@@ -54,38 +86,70 @@ function StatusDialog({
   setStatuses,
   token,
 }: {
-  open: boolean
-  onOpenChange: (v: boolean) => void
-  statuses: { id: string; name: string }[]
-  setStatuses: (s: { id: string; name: string }[]) => void
-  token: string
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  statuses: { id: string; name: string }[];
+  setStatuses: (s: { id: string; name: string }[]) => void;
+  token: string;
 }) {
-  const [newName, setNewName] = useState('')
+  /* ---------- adicionar ---------- */
+  const [newName, setNewName] = useState("");
 
   const add = () =>
     startTransition(async () => {
-      if (!newName.trim()) return
+      if (!newName.trim()) return;
       try {
         const created = await createProgramSetStatus({
           accessToken: token,
           name: newName,
-        })
-        setStatuses([...statuses, created])
-        setNewName('')
+        });
+        setStatuses([...statuses, created]);
+        setNewName("");
       } catch {
-        toast.error('Erro ao criar status')
+        toast.error("Erro ao criar status");
       }
-    })
+    });
 
+  /* ---------- remover ---------- */
   const remove = (id: string) =>
     startTransition(async () => {
       try {
-        await deleteProgramSetStatus(token, id)
-        setStatuses(statuses.filter(s => s.id !== id))
+        await deleteProgramSetStatus(token, id);
+        setStatuses(statuses.filter((s) => s.id !== id));
       } catch {
-        toast.error('Erro ao remover status')
+        toast.error("Erro ao remover status");
       }
-    })
+    });
+
+  /* ---------- editar ---------- */
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingName, setEditingName] = useState("");
+
+  const startEdit = (id: string, current: string) => {
+    setEditingId(id);
+    setEditingName(current);
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditingName("");
+  };
+
+  const saveEdit = () =>
+    startTransition(async () => {
+      if (!editingId || !editingName.trim()) return;
+      try {
+        const updated = await updateProgramSetStatus({
+          accessToken: token,
+          id: editingId,
+          name: editingName,
+        });
+        setStatuses(statuses.map((s) => (s.id === editingId ? updated : s)));
+        cancelEdit();
+      } catch {
+        toast.error("Erro ao atualizar status");
+      }
+    });
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -95,24 +159,65 @@ function StatusDialog({
         </DialogHeader>
 
         <div className="space-y-5">
-          {statuses.map(s => (
-            <div key={s.id} className="flex items-center justify-between">
-              <span className="truncate">{s.name}</span>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => remove(s.id)}
-                className="text-destructive"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
+          {/* lista existente */}
+          {statuses.map((s) => (
+            <div key={s.id} className="flex items-center justify-between gap-2">
+              {editingId === s.id ? (
+                /* ----- modo edição ----- */
+                <>
+                  <Input
+                    value={editingName}
+                    onChange={(e) => setEditingName(e.target.value)}
+                    className="flex-1"
+                  />
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={saveEdit}
+                    className="text-green-600"
+                  >
+                    <Check className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={cancelEdit}
+                    className="text-destructive"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </>
+              ) : (
+                /* ----- visualização normal ----- */
+                <>
+                  <span className="truncate flex-1">{s.name}</span>
+
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => startEdit(s.id, s.name)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => remove(s.id)}
+                    className="text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </>
+              )}
             </div>
           ))}
 
+          {/* adicionar novo status */}
           <div className="flex gap-2">
             <Input
               value={newName}
-              onChange={e => setNewName(e.target.value)}
+              onChange={(e) => setNewName(e.target.value)}
               placeholder="Novo status"
               className="flex-1"
             />
@@ -124,21 +229,25 @@ function StatusDialog({
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
 
 /* ═════════ SetCard ═════════ */
 interface SetCardProps {
-  index: number
-  control: Control<FormValues>
-  removeSet: (idx: number) => void
-  statuses: { id: string; name: string }[]
+  index: number;
+  control: Control<FormValues>;
+  removeSet: (idx: number) => void;
+  statuses: { id: string; name: string }[];
 }
 function SetCard({ index, control, removeSet, statuses }: SetCardProps) {
-  const { fields: goals, append, remove } = useFieldArray({
+  const {
+    fields: goals,
+    append,
+    remove,
+  } = useFieldArray({
     control,
     name: `sets.${index}.goals`,
-  })
+  });
 
   return (
     <Card className="relative border">
@@ -181,7 +290,7 @@ function SetCard({ index, control, removeSet, statuses }: SetCardProps) {
                     <SelectValue placeholder="Selecione" />
                   </SelectTrigger>
                   <SelectContent>
-                    {statuses.map(s => (
+                    {statuses.map((s) => (
                       <SelectItem key={s.id} value={s.id}>
                         {s.name}
                       </SelectItem>
@@ -221,7 +330,7 @@ function SetCard({ index, control, removeSet, statuses }: SetCardProps) {
           type="button"
           variant="ghost"
           size="sm"
-          onClick={() => append({ name: '' })}
+          onClick={() => append({ name: "" })}
           className="w-full border border-dashed"
         >
           <Plus className="mr-2 h-3 w-3" />
@@ -229,73 +338,81 @@ function SetCard({ index, control, removeSet, statuses }: SetCardProps) {
         </Button>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 /* ═════════ Main component ═════════ */
 interface Props {
-  patientId: string
-  program?: Program
+  patientId: string;
+  program?: Program;
 }
 
 export default function ProgramForm({ patientId, program }: Props) {
-  const { data } = useSession()
-  const token = data?.user.token ?? ''
-  const [statuses, setStatuses] = useState<{ id: string; name: string }[]>([])
-  const [dialogOpen, setDialogOpen] = useState(false)
+  const { data } = useSession();
+  const token = data?.user.token ?? "";
+  const [statuses, setStatuses] = useState<{ id: string; name: string }[]>([]);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   /* carregar status */
   useEffect(() => {
-    if (!token) return
+    if (!token) return;
     listProgramSetStatus(token)
       .then(setStatuses)
-      .catch(() => toast.error('Falha ao carregar status'))
-  }, [token])
+      .catch(() => toast.error("Falha ao carregar status"));
+  }, [token]);
 
   /* react-hook-form */
   const methods = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
-    defaultValues: { name: '', inputs: [], sets: [] },
-  })
-  const { control, handleSubmit, reset, formState } = methods
-  const { isSubmitting } = formState
+    defaultValues: { name: "", inputs: [], sets: [] },
+  });
+  const { control, handleSubmit, reset, formState } = methods;
+  const { isSubmitting } = formState;
 
-  const { fields: inputs, append: addInput, remove: delInput } = useFieldArray({
+  const {
+    fields: inputs,
+    append: addInput,
+    remove: delInput,
+  } = useFieldArray({
     control,
-    name: 'inputs',
-  })
-  const { fields: sets, append: addSet, remove: delSet } = useFieldArray({
+    name: "inputs",
+  });
+  const {
+    fields: sets,
+    append: addSet,
+    remove: delSet,
+  } = useFieldArray({
     control,
-    name: 'sets',
-  })
+    name: "sets",
+  });
 
   /* se vier programa para editar, mapeia status name -> id */
   useEffect(() => {
-    if (!program || !statuses.length) return
-    const mappedSets = program.sets.map(s => ({
+    if (!program || !statuses.length) return;
+    const mappedSets = program.sets.map((s) => ({
       ...s,
       program_set_status_id:
-        statuses.find(st => st.name === s.status)?.id ?? '',
-    }))
-    reset({ ...program, sets: mappedSets, inputs: [] })
-  }, [program, statuses, reset])
+        statuses.find((st) => st.name === s.status)?.id ?? "",
+    }));
+    reset({ ...program, sets: mappedSets, inputs: [] });
+  }, [program, statuses, reset]);
 
   const onSubmit = (values: FormValues) => {
-    const payload = { ...values, patient_id: patientId, accessToken: token }
+    const payload = { ...values, patient_id: patientId, accessToken: token };
     startTransition(async () => {
       try {
         if (values.id) {
-          await updateProgram(values.id, payload)
-          toast.success('Programa atualizado!')
+          await updateProgram(values.id, payload);
+          toast.success("Programa atualizado!");
         } else {
-          await createProgram(payload)
-          toast.success('Programa criado!')
+          await createProgram(payload);
+          toast.success("Programa criado!");
         }
       } catch {
-        toast.error('Erro ao salvar programa')
+        toast.error("Erro ao salvar programa");
       }
-    })
-  }
+    });
+  };
 
   return (
     <>
@@ -310,26 +427,23 @@ export default function ProgramForm({ patientId, program }: Props) {
 
       <Form {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="mx-auto max-w-5xl space-y-8 p-6">
+          <div className="mx-auto space-y-8 p-6">
             {/* header */}
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon">
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
               <div>
-                <h1 className="text-2xl font-semibold">
-                  {program ? 'Editar Programa' : 'Novo Programa'}
+                <h1 className="text-2xl font-semibold text-text-title">
+                  {program ? "Editar Programa" : "Novo Programa"}
                 </h1>
                 <p className="text-sm text-muted-foreground">
                   {program
-                    ? 'Altere as informações do programa'
-                    : 'Configure a estrutura do programa'}
+                    ? "Altere as informações do programa"
+                    : "Configure a estrutura do programa"}
                 </p>
               </div>
             </div>
 
             {/* info básicas */}
-            <Card>
+            <Card className="pb-6">
               <CardHeader>
                 <CardTitle>Informações Básicas</CardTitle>
               </CardHeader>
@@ -351,7 +465,7 @@ export default function ProgramForm({ patientId, program }: Props) {
             </Card>
 
             {/* inputs */}
-            <Card>
+            <Card className="pb-6">
               <Collapsible defaultOpen>
                 <CollapsibleTrigger asChild>
                   <CardHeader className="cursor-pointer hover:bg-muted/50">
@@ -367,12 +481,12 @@ export default function ProgramForm({ patientId, program }: Props) {
                   </CardHeader>
                 </CollapsibleTrigger>
 
-                <CollapsibleContent>
+                <CollapsibleContent className="pt-4">
                   <CardContent className="space-y-4">
                     {inputs.map((input, idx) => (
                       <div
                         key={input.id ?? idx}
-                        className="relative rounded-lg border p-4"
+                        className="relative rounded-lg border p-4 space-y-4"
                       >
                         {/* Nome */}
                         <FormField
@@ -408,9 +522,7 @@ export default function ProgramForm({ patientId, program }: Props) {
                                     <SelectItem value="number">
                                       Numérico
                                     </SelectItem>
-                                    <SelectItem value="text">
-                                      Texto
-                                    </SelectItem>
+                                    <SelectItem value="text">Texto</SelectItem>
                                   </SelectContent>
                                 </Select>
                               </FormControl>
@@ -421,10 +533,10 @@ export default function ProgramForm({ patientId, program }: Props) {
 
                         {/* badge + delete */}
                         <Badge
-                          variant={typeBadge[input.type as 'number' | 'text']}
+                          variant={typeBadge[input.type as "number" | "text"]}
                           className="absolute top-2 right-11"
                         >
-                          {typeLabel[input.type as 'number' | 'text']}
+                          {typeLabel[input.type as "number" | "text"]}
                         </Badge>
                         <Button
                           type="button"
@@ -441,7 +553,7 @@ export default function ProgramForm({ patientId, program }: Props) {
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={() => addInput({ name: '', type: 'number' })}
+                      onClick={() => addInput({ name: "", type: "number" })}
                       className="w-full"
                     >
                       <Plus className="mr-2 h-4 w-4" />
@@ -453,7 +565,7 @@ export default function ProgramForm({ patientId, program }: Props) {
             </Card>
 
             {/* sets */}
-            <Card>
+            <Card className="pb-6">
               <Collapsible defaultOpen>
                 <CollapsibleTrigger asChild>
                   <CardHeader className="cursor-pointer hover:bg-muted/50">
@@ -483,7 +595,7 @@ export default function ProgramForm({ patientId, program }: Props) {
                   </CardHeader>
                 </CollapsibleTrigger>
 
-                <CollapsibleContent>
+                <CollapsibleContent className="pt-4">
                   <CardContent className="space-y-6">
                     {sets.map((set, idx) => (
                       <SetCard
@@ -500,9 +612,9 @@ export default function ProgramForm({ patientId, program }: Props) {
                       variant="outline"
                       onClick={() =>
                         addSet({
-                          name: '',
-                          program_set_status_id: '',
-                          goals: [{ name: '' }],
+                          name: "",
+                          program_set_status_id: "",
+                          goals: [{ name: "" }],
                         })
                       }
                       className="w-full"
@@ -515,22 +627,19 @@ export default function ProgramForm({ patientId, program }: Props) {
               </Collapsible>
             </Card>
 
-            {/* actions */}
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex justify-end gap-2 items-center">
+              <BackButton label="Cancelar" />
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex-1 h-11"
+                className="bg-blue-primary hover:bg-blue-primary/90"
               >
-                {program ? 'Atualizar' : 'Salvar'} Programa
-              </Button>
-              <Button type="button" variant="outline" className="h-11">
-                Cancelar
+                {program ? "Atualizar" : "Salvar"} Programa
               </Button>
             </div>
           </div>
         </form>
       </Form>
     </>
-  )
+  );
 }

@@ -41,6 +41,7 @@ import { z } from "zod";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { Patient } from "@/types/patient";
+import { BackButton } from "../back-button";
 
 interface PatientFormProps {
   organizationId: string;
@@ -286,13 +287,14 @@ export function PatientForm({ organizationId, patient }: PatientFormProps) {
                   />
                 </div>
 
-                <div className="flex justify-end">
+                <div className="flex justify-end gap-2 items-center">
+                  <BackButton label="Cancelar" />
                   <Button
                     type="submit"
                     disabled={isPending}
-                    className="bg-black hover:bg-black/90 text-white"
+                    className="bg-blue-primary hover:bg-blue-primary/90"
                   >
-                    {isPending ? "Salvando..." : "Cadastrar Paciente"}
+                    Salvar
                   </Button>
                 </div>
               </form>
