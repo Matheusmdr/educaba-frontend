@@ -1,20 +1,11 @@
 "use client";
 
-import {
-  BadgeCheck,
-  Bell,
-  ChevronsUpDown,
-  CreditCard,
-  LogOut,
-  Sparkles,
-} from "lucide-react";
+import { ChevronsUpDown } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -26,22 +17,11 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { UserResponse } from "@/types/user";
-import { env } from "@/env";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import { SignOutButton } from "@/components/signout-button";
+import { getUser } from "@/server/actions/user";
 
-async function getUser(accessToken?: string): Promise<UserResponse | null> {
-  if (!accessToken) return null;
-
-  const res = await fetch(`${env.NEXT_PUBLIC_API_HOST}/api/user/me`, {
-    headers: { Authorization: `Bearer ${accessToken}` },
-    cache: "force-cache",
-  });
-
-  if (!res.ok) return null;
-
-  return res.json();
-}
 
 export function NavUser() {
   const session = useSession();
@@ -63,11 +43,11 @@ export function NavUser() {
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              className="cursor-pointer data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <Avatar className="h-8 w-8 rounded-lg">
+              <Avatar className="h-8 w-8 rounded-full">
                 <AvatarImage src={user?.name} alt={user?.name} />
-                <AvatarFallback className="rounded-lg">
+                <AvatarFallback className="rounded-full">
                   {user?.name[0]}
                 </AvatarFallback>
               </Avatar>
@@ -99,14 +79,7 @@ export function NavUser() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <Sparkles />
-                Upgrade to Pro
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
+            {/* <DropdownMenuGroup>
               <DropdownMenuItem>
                 <BadgeCheck />
                 Account
@@ -119,12 +92,9 @@ export function NavUser() {
                 <Bell />
                 Notifications
               </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <LogOut />
-              Log out
-            </DropdownMenuItem>
+            </DropdownMenuGroup> */}
+            {/* <DropdownMenuSeparator /> */}
+            <SignOutButton />
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
