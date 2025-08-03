@@ -19,7 +19,6 @@ interface DataTableRowActionsProps<TData extends { id: string }>
 }
 
 export function DataTableRowActions<TData extends { id: string }>({
-  row,
   editUrl,
   DeleteDialog,
   children,
