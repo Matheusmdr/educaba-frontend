@@ -18,11 +18,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-
 import { Loader2 } from "lucide-react";
-
-import EducabaLogo from "@/assets/educaba-logo.png"
 import Image from "next/image";
+import EducabaLogo from "@/assets/educaba-logo.png";
 
 const formSchema = z.object({
   email: z.string().email("Forneça um email válido."),
@@ -61,13 +59,13 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center  p-4">
-      <Image src={EducabaLogo} alt="Logo Educaba" className="max-w-52"/>
-      <div className="w-full max-w-md rounded-md bg-white p-6">
-        <h1 className="mb-4 text-2xl font-semibold text-text-title">
+    <div className="flex min-h-screen flex-col items-center justify-center p-4 bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
+      <Image src={EducabaLogo} alt="Logo Educaba" className="max-w-52" />
+      <div className="w-full max-w-md rounded-md bg-white dark:bg-gray-900 p-6 shadow-md">
+        <h1 className="mb-4 text-2xl font-semibold text-text-title dark:text-white">
           Bem vindo(a) de volta
         </h1>
-        <p className="mb-6 text-sm text-text-light">
+        <p className="mb-6 text-sm text-text-light dark:text-gray-300">
           Por favor, insira seu endereço de e-mail e senha para login
         </p>
 
@@ -78,9 +76,13 @@ export default function SignInPage() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>E-mail</FormLabel>
+                  <FormLabel className="dark:text-gray-200">E-mail</FormLabel>
                   <FormControl>
-                    <Input placeholder="jane.doe@gmail.com" className="border-[#E9F1FF] border rounded-xl text-text-title" {...field} />
+                    <Input
+                      placeholder="jane.doe@gmail.com"
+                      className="border-[#E9F1FF] dark:border-gray-700 dark:bg-gray-800 dark:text-white border"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -92,12 +94,12 @@ export default function SignInPage() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Senha</FormLabel>
+                  <FormLabel className="dark:text-gray-200">Senha</FormLabel>
                   <FormControl>
                     <Input
                       type="password"
                       placeholder="Insira sua senha"
-                      className="border-[#E9F1FF] border rounded-xl text-text-title"
+                      className="border-[#E9F1FF] dark:border-gray-700 dark:bg-gray-800 dark:text-white border"
                       {...field}
                     />
                   </FormControl>
@@ -107,12 +109,18 @@ export default function SignInPage() {
             />
 
             <div className="flex justify-end">
-              <a href="#" className="text-sm font-medium text-text-title hover:underline">
+              <a
+                href="#"
+                className="text-sm font-medium text-text-title dark:text-gray-200 hover:underline"
+              >
                 Esqueceu sua senha?
               </a>
             </div>
 
-            <Button type="submit" className="w-full cursor-pointer bg-blue-primary hover:bg-blue-primary/67 transition-all duration-300 rounded-xl">
+            <Button
+              type="submit"
+              className="w-full cursor-pointer bg-blue-primary hover:bg-blue-primary/67 dark:bg-blue-600 dark:hover:bg-blue-500 transition-all duration-300"
+            >
               {isLoading && (
                 <Loader2 className="w-4 h-4 text-white animate-spin" />
               )}
