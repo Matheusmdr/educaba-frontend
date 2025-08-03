@@ -108,7 +108,7 @@ export default function ProgramRecordForm({ program, record }: Props) {
   return (
     <Form {...methods}>
       <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-        <Card>
+        <Card className="border-none pb-4 shadow-none">
           <CardHeader>
             <CardTitle>
               {record ? "Editar Registro" : "Novo Registro"} – {program.name}
